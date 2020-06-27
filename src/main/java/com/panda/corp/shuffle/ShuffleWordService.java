@@ -33,10 +33,6 @@ public class ShuffleWordService {
         this.wordsCollection = wordsCollection;
     }
 
-    public int mapSize() {
-        return wordsCollection.size();
-    }
-
     public String getWordToGuess() {
         if (wordsCollection.size() == 0) {
            return "No words to guess left";
