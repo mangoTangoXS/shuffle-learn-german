@@ -38,9 +38,9 @@ public class ShuffleWordService {
 
     String getWord(String language) {
         switch (language) {
-            case "english":
+            case "ENG":
                 return getWordToGuesses(wordsCollectionDE);
-            case "german":
+            case "DE":
                 return getWordToGuesses(wordsCollectionENG);
             default:
                 return "wrong input";
@@ -57,24 +57,36 @@ public class ShuffleWordService {
         return new ArrayList<>(wordsCollection.keySet()).get(random.nextInt(wordsCollection.size()));
     }
 
-    ShuffleResponseDTO checkIfCorrectAnswer(String key, String inputValue) {
-        if (!wordsCollectionDE.containsKey(key)) {
-            numberOfNotGuessed++;
-            return createResponse(false);
-        }
-
-        if (inputValue.equals(wordsCollectionDE.get(key))) {
-            wordsCollectionDE.remove(key);
-            return createResponse(true);
-        } else {
-            difficultWords.put(key, wordsCollectionDE.get(key));
-            numberOfNotGuessed++;
-            return createResponse(false);
+    ShuffleResponseDTO getLanguageToBeChecked(String language, String key, String inputValue) {
+        switch (language) {
+            case "ENG":
+                return checkIfCorrectAnswer(key, inputValue, wordsCollectionDE);
+            case "DE":
+                return checkIfCorrectAnswer(key, inputValue, wordsCollectionENG);
+            default:
+                throw new RuntimeException("Wrong input");
         }
     }
 
-    private ShuffleResponseDTO createResponse(boolean result) {
-        int numberOfCorrectAnswers = (int) (database.count() - wordsCollectionDE.size());
-        return ShuffleResponseDTO.of(result, numberOfCorrectAnswers, numberOfNotGuessed, wordsCollectionDE.size());
+    private ShuffleResponseDTO checkIfCorrectAnswer(String key, String inputValue, Map<String, String> wordsCollection) {
+
+        if (!wordsCollection.containsKey(key)) {
+            numberOfNotGuessed++;
+            return createResponse(false, wordsCollection);
+        }
+
+        if (inputValue.equals(wordsCollection.get(key))) {
+            wordsCollection.remove(key);
+            return createResponse(true, wordsCollection);
+        } else {
+            difficultWords.put(key, wordsCollection.get(key));
+            numberOfNotGuessed++;
+            return createResponse(false, wordsCollection);
+        }
+    }
+
+    private ShuffleResponseDTO createResponse(boolean result, Map<String, String> wordsCollection) {
+        int numberOfCorrectAnswers = (int) (database.count() - wordsCollection.size());
+        return ShuffleResponseDTO.of(result, numberOfCorrectAnswers, numberOfNotGuessed, wordsCollection.size());
     }
 }

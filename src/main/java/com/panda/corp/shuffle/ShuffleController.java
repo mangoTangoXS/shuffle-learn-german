@@ -22,7 +22,7 @@ public class ShuffleController {
     }
 
     @GetMapping("/guess")
-    public ResponseEntity<ShuffleResponseDTO> getWord(@RequestParam String key, @RequestParam String guessWord) {
-        return ResponseEntity.ok(shuffleWordService.checkIfCorrectAnswer(key, guessWord));
+    public ResponseEntity<ShuffleResponseDTO> getWord(@RequestParam String language, @RequestParam String key, @RequestParam String guessWord) {
+        return ResponseEntity.ok(shuffleWordService.getLanguageToBeChecked(language, key, guessWord));
     }
 }
