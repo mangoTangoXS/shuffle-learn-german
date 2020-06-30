@@ -17,8 +17,8 @@ public class ShuffleController {
     }
 
     @GetMapping("/getWord")
-    public ResponseEntity<String> getWord() {
-        return ResponseEntity.ok(shuffleWordService.getWordToGuess());
+    public ResponseEntity<String> getWord(@RequestParam String language) {
+        return ResponseEntity.ok(shuffleWordService.getWord(language));
     }
 
     @GetMapping("/guess")
