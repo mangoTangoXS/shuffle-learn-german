@@ -22,6 +22,7 @@ public class ShuffleWordEngDe implements ShuffleWord {
         random = new Random();
         wordsCollection = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         shuffleWordDatabase.findAll().forEach(vocabEntity -> wordsCollection.put(vocabEntity.getValue(), vocabEntity.getKey()));
+
         vocabSize = wordsCollection.size();
         difficultWords = new HashMap<>();
     }
@@ -42,7 +43,25 @@ public class ShuffleWordEngDe implements ShuffleWord {
             return createResponse(false);
         }
 
-        if (inputValue.equalsIgnoreCase(wordsCollection.get(key))) {
+        String value = wordsCollection.get(key);
+        if (value.contains("/")) {
+            String[] translation = value.split("/ ");
+            return getShuffleResponseIfKeyContainsSlash(key, inputValue, translation);
+        } else {
+
+            if (inputValue.equalsIgnoreCase(wordsCollection.get(key))) {
+                wordsCollection.remove(key);
+                return createResponse(true);
+            } else {
+                difficultWords.put(key, wordsCollection.get(key));
+                numberOfNotGuessed++;
+                return createResponse(false);
+            }
+        }
+    }
+
+    private ShuffleResponseDTO getShuffleResponseIfKeyContainsSlash(String key, String inputValue, String[] translation) {
+        if (Arrays.asList(translation).contains(inputValue)) {
             wordsCollection.remove(key);
             return createResponse(true);
         } else {
