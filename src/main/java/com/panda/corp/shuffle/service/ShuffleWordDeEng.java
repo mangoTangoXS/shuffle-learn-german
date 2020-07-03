@@ -2,6 +2,7 @@ package com.panda.corp.shuffle.service;
 
 import com.panda.corp.shuffle.ShuffleResponseDTO;
 import com.panda.corp.shuffle.ShuffleWordDatabase;
+import com.panda.corp.shuffle.VocabEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,10 +25,18 @@ public class ShuffleWordDeEng implements ShuffleWord {
         random = new Random();
 
         wordsCollection = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        shuffleWordDatabase.findAll().forEach(vocabEntity -> wordsCollection.put(vocabEntity.getKey(), vocabEntity.getValue()));
-        vocabSize=wordsCollection.size();
+        shuffleWordDatabase.findAll().forEach(this::initWords);
+        vocabSize = wordsCollection.size();
         difficultWords = new HashMap<>();
+    }
 
+    private void initWords(VocabEntity vocabEntity) {
+        if (vocabEntity.getKey().contains("/")) {
+            Arrays.stream(vocabEntity.getKey().split("/"))
+                    .forEach(key -> wordsCollection.put(key.trim(), vocabEntity.getValue()));
+        } else {
+            wordsCollection.put(vocabEntity.getKey(), vocabEntity.getValue());
+        }
     }
 
     @Override
